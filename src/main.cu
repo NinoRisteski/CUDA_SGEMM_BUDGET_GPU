@@ -74,12 +74,25 @@ int main(int argc, char **argv) {
   const dim3 block(16, 16);
   const dim3 grid((M + block.x - 1) / block.x, (N + block.y - 1) / block.y);
 
+  cudaEvent_t start, stop;
+
   const float alpha = 1.0f;
   const float beta = 0.0f;
 
   sgemm_naive<<<grid, block>>>(M, N, K, alpha, d_A, d_B, beta, d_C);
   checkCuda(cudaGetLastError(), "Kernel launch failed");
   checkCuda(cudaDeviceSynchronize(), "Kernel execution failed");
+
+  float elapsed_ms = 0.0f;
+  checkCuda(cudaEventElapsedTime(&elapsed_ms, start, stop),
+            "cudaEventElapsedTime");
+  const double flops = 2.0 * static_cast<double>(M) * N * K;
+  const double gflops = flops / (elapsed_ms * 1.0e6);
+  std::cout << "Kernel 0 (naive) runtime: " << elapsed_ms << " ms, "
+            << gflops << " GFLOPs/s" << std::endl;
+
+  cudaEventDestroy(start);
+  cudaEventDestroy(stop);
 
   checkCuda(cudaMemcpy(h_C.data(), d_C, size_C * sizeof(float),
                        cudaMemcpyDeviceToHost),
