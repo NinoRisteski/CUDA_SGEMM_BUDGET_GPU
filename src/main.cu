@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
   if (argc < 2) {
     std::cerr << "Usage: DEVICE=<device_id> " << argv[0] << " <kernel_id> "
               << "[M N K]" << std::endl;
+    std::cerr << "Default problem size: M = N = K = 4096" << std::endl;
     std::cerr << "Available kernels: 0 = naive" << std::endl;
     return EXIT_FAILURE;
   }
@@ -30,7 +31,7 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  int M = 512, N = 512, K = 512;
+  int M = 4096, N = 4096, K = 4096;
   if (argc == 5) {
     M = std::atoi(argv[2]);
     N = std::atoi(argv[3]);
